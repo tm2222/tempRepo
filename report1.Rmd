@@ -1,0 +1,90 @@
+Empirically proving properties of an exponential distribution
+========================================================
+
+This document has been submitted as a part of Statistical Inference course.  
+  
+There are 4 parts to this report. Each part tries to answer one question asked as a part of the assignment.  
+
+The following code will create the necessary data.  
+```{r}
+lambda <- 0.2
+n <- 40
+nosim <- 10000
+expMeans <- vector()
+expSD <- vector()
+for (i in 1:nosim) {
+    expMeans[i] <- mean(rexp(n, lambda))
+    expSD[i] <- sd(rexp(n, lambda))
+}
+```
+
+**Part 1**  
+------------
+Show where the distribution is centered at and compare it to the theoretical center of the distribution.  
+
+The theoretical center for an exponential distribution is 1/lambda. In this case, it will be 1/0.2 = 5.  
+
+Let's see what our data says.
+```{r}
+mean(expMeans)
+```
+
+Thus, both the mean and the median is very close to the theoretically center.  
+
+
+**Part 2**  
+------------
+Show how variable it is and compare it to the theoretical variance of the distribution.  
+
+The theoretical variance for our distribution will be  
+(population variance)/(sample size) = (1/0.2)^2 /40 = 0.625  
+
+Let's check the variance in our data
+```{r}
+var(expMeans)
+```
+
+Again, the theoretical variance and the computed variance are very close.  
+With an increase in the number of simulations (variable 'nosim'), we will be able to see that the empirical evidence more strongly resembles the theoretically computed data.  
+
+
+**Part 3**  
+------------
+Show that the distribution is approximately normal  
+
+We know that approximately 68.27%, 95.45% and 99.73% of the normal density lies within 1, 2, and 3 standard deviations from the mean, respectively.  
+
+Let's check this for our data.  
+The code below gets the number of elements in expMeans which fall within 1 standard deviation of mean.  
+```{r}
+mn <- mean(expMeans)
+stdDev <- sd(expMeans)
+length(expMeans[expMeans > mn-stdDev & expMeans < mn+stdDev])
+```
+which is very close to 68.27% of 10000.
+
+Similarly, we can check for 2 and 3 standard deviations from mean and see that they are approximately 95.45% and 99.73% of the values respectively.
+```{r}
+length(expMeans[expMeans > mn-2*stdDev & expMeans < mn+2*stdDev])
+length(expMeans[expMeans > mn-3*stdDev & expMeans < mn+3*stdDev])
+```
+
+In addition, figure 1 in appendix compares a histogram of our data with a histogram created from an equal number of random normal deviates. The plots look similar.  
+
+**Part 4**  
+------------
+Evaluate the coverage of the confidence interval for 1/lambda: $$X±1.96 * S/n^{1/2}$$  
+
+
+
+APPENDIX
+============ 
+**Figure 1:** Comparing histogram of our data with a histogram created from an equal number of random normal deviates.  
+```{r fig.width=6, fig.height=8}
+rnormDist <- rnorm(10000, 5, 5/sqrt(40))
+
+par(mfrow=c(2, 1))
+hist(expMeans, breaks=100, xlim=c(3,7), main="Histogram of simulation data")
+hist(rnormDist, breaks=100, xlim=c(3,7), main="Histogram of normal data")
+```
+
